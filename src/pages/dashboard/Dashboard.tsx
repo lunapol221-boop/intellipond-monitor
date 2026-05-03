@@ -1,0 +1,167 @@
+import { useEffect, useState } from "react";
+import { AppShell } from "@/components/AppShell";
+import { PageHeader, EmptyState } from "@/components/Common";
+import { supabase } from "@/integrations/supabase/client";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Droplets, FlaskConical, Thermometer, Eye, Activity, Fish, AlertCircle, Waves, TrendingUp } from "lucide-react";
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
+import { evaluatePond, deriveBehavior, getSettings, Settings, DEFAULT_SETTINGS } from "@/lib/pond";
+import { format } from "date-fns";
+
+const Dashboard = () => {
+  const [latest, setLatest] = useState<any>(null);
+  const [history, setHistory] = useState<any[]>([]);
+  const [pondCount, setPondCount] = useState(0);
+  const [alerts, setAlerts] = useState<any[]>([]);
+  const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
+  const [growthCount, setGrowthCount] = useState(0);
+
+  useEffect(() => {
+    let mounted = true;
+    const load = async () => {
+      const [s, ponds, latestR, hist, al, gr] = await Promise.all([
+        getSettings(),
+        supabase.from("pond_profiles").select("id", { count: "exact", head: true }),
+        supabase.from("sensor_readings").select("*").order("recorded_at", { ascending: false }).limit(1).maybeSingle(),
+        supabase.from("sensor_readings").select("*").order("recorded_at", { ascending: false }).limit(24),
+        supabase.from("alerts").select("*").eq("acknowledged", false).order("created_at", { ascending: false }).limit(5),
+        supabase.from("bangus_growth_records").select("id", { count: "exact", head: true }),
+      ]);
+      if (!mounted) return;
+      setSettings(s);
+      setPondCount(ponds.count ?? 0);
+      setLatest(latestR.data);
+      setHistory((hist.data ?? []).reverse());
+      setAlerts(al.data ?? []);
+      setGrowthCount(gr.count ?? 0);
+    };
+    load();
+    const ch = supabase.channel("dash").on("postgres_changes", { event: "*", schema: "public", table: "sensor_readings" }, load).subscribe();
+    return () => { mounted = false; supabase.removeChannel(ch); };
+  }, []);
+
+  const evaluation = evaluatePond(latest, settings);
+  const behavior = deriveBehavior(latest, settings);
+
+  const sensors = [
+    { icon: Droplets, label: "Dissolved O₂", val: latest?.do_mg_l, unit: "mg/L", ok: latest && latest.do_mg_l >= settings.do_min && latest.do_mg_l <= settings.do_max },
+    { icon: FlaskConical, label: "pH Level", val: latest?.ph, unit: "", ok: latest && latest.ph >= settings.ph_min && latest.ph <= settings.ph_max },
+    { icon: Thermometer, label: "Temperature", val: latest?.temperature_c, unit: "°C", ok: latest && latest.temperature_c >= settings.temp_min && latest.temperature_c <= settings.temp_max },
+    { icon: Eye, label: "Turbidity", val: latest?.turbidity_ntu, unit: "NTU", ok: latest && latest.turbidity_ntu <= settings.turbidity_max },
+  ];
+
+  const statusColor = evaluation.status === "healthy" ? "bg-success text-success-foreground"
+    : evaluation.status === "watch" ? "bg-warning text-warning-foreground"
+    : evaluation.status === "critical" ? "bg-destructive text-destructive-foreground" : "bg-muted text-muted-foreground";
+
+  return (
+    <AppShell>
+      <PageHeader title="Pond Overview" subtitle="Live snapshot of your aquaculture system." />
+
+      {/* Hero status */}
+      <Card className="overflow-hidden border-border/60 mb-6">
+        <div className="grid md:grid-cols-3 gap-0">
+          <div className="md:col-span-2 p-8 gradient-deep text-white relative">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,hsl(188_85%_55%/0.3),transparent_50%)]" />
+            <div className="relative">
+              <div className="flex items-center gap-2 text-white/70 text-sm mb-2">
+                <Waves className="h-4 w-4" /> Overall Pond Condition
+              </div>
+              <div className="flex items-baseline gap-4">
+                <div className="text-5xl font-semibold capitalize">{evaluation.status}</div>
+                <Badge className={statusColor + " border-0"}>{evaluation.score}/100</Badge>
+              </div>
+              <p className="mt-3 text-white/70 max-w-md">
+                {latest ? (evaluation.issues.length === 0 ? "All parameters are within optimal range." : evaluation.issues.join(" · "))
+                  : "Awaiting sensor sync. Your pond status will appear here once data is recorded."}
+              </p>
+              {latest && <div className="text-xs text-white/50 mt-4 font-mono">Last reading · {format(new Date(latest.recorded_at), "MMM d, HH:mm")}</div>}
+            </div>
+          </div>
+          <div className="p-6 grid grid-cols-2 gap-3 bg-card">
+            <MiniStat icon={Activity} label="Behavior" value={behavior} accent={behavior === "Normal"} />
+            <MiniStat icon={Fish} label="Growth records" value={growthCount.toString()} />
+            <MiniStat icon={AlertCircle} label="Open alerts" value={alerts.length.toString()} accent={alerts.length === 0} />
+            <MiniStat icon={TrendingUp} label="Ponds" value={pondCount.toString()} />
+          </div>
+        </div>
+      </Card>
+
+      {/* Sensors */}
+      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        {sensors.map((s, i) => (
+          <div key={i} className="stat-tile">
+            <div className="flex items-center justify-between mb-3">
+              <s.icon className="h-5 w-5 text-accent" />
+              {latest && <span className={`ripple-dot ${s.ok ? "bg-success" : "bg-destructive"}`} />}
+            </div>
+            <div className="text-xs uppercase tracking-wider text-muted-foreground">{s.label}</div>
+            <div className="font-mono text-3xl mt-1">
+              {s.val != null ? Number(s.val).toFixed(2) : "—"}
+              <span className="text-sm text-muted-foreground ml-1">{s.unit}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="grid lg:grid-cols-3 gap-6">
+        <Card className="lg:col-span-2 p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h3 className="font-semibold">Water Quality Trend</h3>
+              <p className="text-xs text-muted-foreground">Recent sensor readings</p>
+            </div>
+          </div>
+          {history.length === 0 ? (
+            <EmptyState icon={Activity} title="No sensor readings available yet." description="Charts will populate as data flows in." />
+          ) : (
+            <div className="h-72">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={history.map(h => ({ ...h, t: format(new Date(h.recorded_at), "HH:mm") }))}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                  <XAxis dataKey="t" stroke="hsl(var(--muted-foreground))" fontSize={11} />
+                  <YAxis stroke="hsl(var(--muted-foreground))" fontSize={11} />
+                  <Tooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8 }} />
+                  <Line type="monotone" dataKey="do_mg_l" stroke="hsl(var(--accent))" strokeWidth={2} dot={false} name="DO" />
+                  <Line type="monotone" dataKey="ph" stroke="hsl(var(--success))" strokeWidth={2} dot={false} name="pH" />
+                  <Line type="monotone" dataKey="temperature_c" stroke="hsl(var(--warning))" strokeWidth={2} dot={false} name="Temp" />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          )}
+        </Card>
+
+        <Card className="p-6">
+          <h3 className="font-semibold mb-1">Alerts & Recommendations</h3>
+          <p className="text-xs text-muted-foreground mb-4">Active issues that need attention</p>
+          {alerts.length === 0 ? (
+            <EmptyState icon={AlertCircle} title="All clear" description="No active alerts at this time." />
+          ) : (
+            <div className="space-y-3">
+              {alerts.map(a => (
+                <div key={a.id} className="p-3 rounded-lg border border-border bg-secondary/30">
+                  <div className="flex items-center justify-between">
+                    <Badge variant="outline" className="text-[10px] uppercase">{a.severity}</Badge>
+                    <span className="text-[10px] text-muted-foreground">{format(new Date(a.created_at), "HH:mm")}</span>
+                  </div>
+                  <div className="text-sm font-medium mt-2">{a.message}</div>
+                  {a.recommendation && <div className="text-xs text-muted-foreground mt-1">→ {a.recommendation}</div>}
+                </div>
+              ))}
+            </div>
+          )}
+        </Card>
+      </div>
+    </AppShell>
+  );
+};
+
+const MiniStat = ({ icon: Icon, label, value, accent }: any) => (
+  <div className="rounded-xl p-3 bg-secondary/40">
+    <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-muted-foreground"><Icon className="h-3 w-3" />{label}</div>
+    <div className={`mt-1.5 font-semibold ${accent ? "text-success" : ""}`}>{value}</div>
+  </div>
+);
+
+export default Dashboard;
