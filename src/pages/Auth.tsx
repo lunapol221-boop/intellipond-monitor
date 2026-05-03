@@ -36,12 +36,12 @@ const Auth = () => {
     e.preventDefault(); setLoading(true);
     const { error } = await supabase.auth.signUp({
       email, password,
-      options: { emailRedirectTo: `${window.location.origin}/dashboard`, data: { full_name: fullName } }
+      options: { emailRedirectTo: `${window.location.origin}/pending-approval`, data: { full_name: fullName } }
     });
     setLoading(false);
     if (error) return toast.error(error.message);
-    toast.success("Account created");
-    nav("/dashboard");
+    toast.success("Account created — awaiting admin approval");
+    nav("/pending-approval");
   };
 
   return (

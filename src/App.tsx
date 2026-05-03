@@ -7,6 +7,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
+import PendingApproval from "./pages/PendingApproval";
 import NotFound from "./pages/NotFound";
 import Dashboard from "./pages/dashboard/Dashboard";
 import Behavior from "./pages/dashboard/Behavior";
@@ -33,6 +34,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/pending-approval" element={<PendingApproval />} />
 
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="/dashboard/behavior" element={<ProtectedRoute><Behavior /></ProtectedRoute>} />
