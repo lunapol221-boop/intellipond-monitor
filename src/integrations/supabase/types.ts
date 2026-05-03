@@ -14,16 +14,386 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      admin_settings: {
+        Row: {
+          alerts_enabled: boolean
+          do_max: number
+          do_min: number
+          id: string
+          ph_max: number
+          ph_min: number
+          temp_max: number
+          temp_min: number
+          turbidity_max: number
+          updated_at: string
+        }
+        Insert: {
+          alerts_enabled?: boolean
+          do_max?: number
+          do_min?: number
+          id?: string
+          ph_max?: number
+          ph_min?: number
+          temp_max?: number
+          temp_min?: number
+          turbidity_max?: number
+          updated_at?: string
+        }
+        Update: {
+          alerts_enabled?: boolean
+          do_max?: number
+          do_min?: number
+          id?: string
+          ph_max?: number
+          ph_min?: number
+          temp_max?: number
+          temp_min?: number
+          turbidity_max?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      alerts: {
+        Row: {
+          acknowledged: boolean
+          category: string
+          created_at: string
+          id: string
+          message: string
+          pond_id: string | null
+          recommendation: string | null
+          severity: string
+        }
+        Insert: {
+          acknowledged?: boolean
+          category: string
+          created_at?: string
+          id?: string
+          message: string
+          pond_id?: string | null
+          recommendation?: string | null
+          severity?: string
+        }
+        Update: {
+          acknowledged?: boolean
+          category?: string
+          created_at?: string
+          id?: string
+          message?: string
+          pond_id?: string | null
+          recommendation?: string | null
+          severity?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "alerts_pond_id_fkey"
+            columns: ["pond_id"]
+            isOneToOne: false
+            referencedRelation: "pond_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bangus_growth_records: {
+        Row: {
+          age_days: number | null
+          avg_length_cm: number | null
+          avg_weight_g: number | null
+          feeding_notes: string | null
+          growth_status: string | null
+          id: string
+          pond_condition: string | null
+          pond_id: string | null
+          recorded_at: string
+        }
+        Insert: {
+          age_days?: number | null
+          avg_length_cm?: number | null
+          avg_weight_g?: number | null
+          feeding_notes?: string | null
+          growth_status?: string | null
+          id?: string
+          pond_condition?: string | null
+          pond_id?: string | null
+          recorded_at?: string
+        }
+        Update: {
+          age_days?: number | null
+          avg_length_cm?: number | null
+          avg_weight_g?: number | null
+          feeding_notes?: string | null
+          growth_status?: string | null
+          id?: string
+          pond_condition?: string | null
+          pond_id?: string | null
+          recorded_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bangus_growth_records_pond_id_fkey"
+            columns: ["pond_id"]
+            isOneToOne: false
+            referencedRelation: "pond_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      behavior_predictions: {
+        Row: {
+          behavior_label: string
+          confidence: number | null
+          created_at: string
+          id: string
+          pond_id: string | null
+          source_reading_id: string | null
+        }
+        Insert: {
+          behavior_label: string
+          confidence?: number | null
+          created_at?: string
+          id?: string
+          pond_id?: string | null
+          source_reading_id?: string | null
+        }
+        Update: {
+          behavior_label?: string
+          confidence?: number | null
+          created_at?: string
+          id?: string
+          pond_id?: string | null
+          source_reading_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "behavior_predictions_pond_id_fkey"
+            columns: ["pond_id"]
+            isOneToOne: false
+            referencedRelation: "pond_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "behavior_predictions_source_reading_id_fkey"
+            columns: ["source_reading_id"]
+            isOneToOne: false
+            referencedRelation: "sensor_readings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ml_model_config: {
+        Row: {
+          id: string
+          selected_model: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          id?: string
+          selected_model?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          id?: string
+          selected_model?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
+      pond_profiles: {
+        Row: {
+          area_sqm: number | null
+          created_at: string
+          id: string
+          location: string | null
+          name: string
+          notes: string | null
+          stocking_date: string | null
+        }
+        Insert: {
+          area_sqm?: number | null
+          created_at?: string
+          id?: string
+          location?: string | null
+          name: string
+          notes?: string | null
+          stocking_date?: string | null
+        }
+        Update: {
+          area_sqm?: number | null
+          created_at?: string
+          id?: string
+          location?: string | null
+          name?: string
+          notes?: string | null
+          stocking_date?: string | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string | null
+          full_name: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      reports: {
+        Row: {
+          created_at: string
+          description: string | null
+          file_path: string | null
+          generated_by: string | null
+          id: string
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          file_path?: string | null
+          generated_by?: string | null
+          id?: string
+          title: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          file_path?: string | null
+          generated_by?: string | null
+          id?: string
+          title?: string
+        }
+        Relationships: []
+      }
+      sensor_readings: {
+        Row: {
+          do_mg_l: number | null
+          id: string
+          ph: number | null
+          pond_id: string | null
+          recorded_at: string
+          temperature_c: number | null
+          turbidity_ntu: number | null
+        }
+        Insert: {
+          do_mg_l?: number | null
+          id?: string
+          ph?: number | null
+          pond_id?: string | null
+          recorded_at?: string
+          temperature_c?: number | null
+          turbidity_ntu?: number | null
+        }
+        Update: {
+          do_mg_l?: number | null
+          id?: string
+          ph?: number | null
+          pond_id?: string | null
+          recorded_at?: string
+          temperature_c?: number | null
+          turbidity_ntu?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sensor_readings_pond_id_fkey"
+            columns: ["pond_id"]
+            isOneToOne: false
+            referencedRelation: "pond_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sensor_status: {
+        Row: {
+          error_message: string | null
+          id: string
+          last_sync: string | null
+          pond_id: string | null
+          sensor_type: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          error_message?: string | null
+          id?: string
+          last_sync?: string | null
+          pond_id?: string | null
+          sensor_type: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          error_message?: string | null
+          id?: string
+          last_sync?: string | null
+          pond_id?: string | null
+          sensor_type?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sensor_status_pond_id_fkey"
+            columns: ["pond_id"]
+            isOneToOne: false
+            referencedRelation: "pond_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "operator"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +520,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "operator"],
+    },
   },
 } as const
