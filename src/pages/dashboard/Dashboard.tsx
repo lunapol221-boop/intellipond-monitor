@@ -40,8 +40,27 @@ const Dashboard = () => {
     };
     load();
     const ch = supabase.channel("dash").on("postgres_changes", { event: "*", schema: "public", table: "sensor_readings" }, load).subscribe();
-    return () => { mounted = false; supabase.removeChannel(ch); };
+    const alertCh = supabase
+      .channel("dash-alerts")
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "alerts" }, (payload) => {
+        const a: any = payload.new;
+        if (a.severity === "critical" || a.severity === "warning") {
+          setHighlightAlert(a);
+          toast[a.severity === "critical" ? "error" : "warning" as "error"](a.message, {
+            description: a.recommendation ?? undefined,
+          });
+        }
+        setAlerts((prev) => [a, ...prev].slice(0, 5));
+      })
+      .subscribe();
+    return () => { mounted = false; supabase.removeChannel(ch); supabase.removeChannel(alertCh); };
   }, []);
+
+  // Seed the highlight from the most recent unacknowledged critical/warning alert on load
+  useEffect(() => {
+    const top = alerts.find((a) => a.severity === "critical" || a.severity === "warning");
+    if (top && !highlightAlert) setHighlightAlert(top);
+  }, [alerts]);
 
   const evaluation = evaluatePond(latest, settings);
   const behavior = deriveBehavior(latest, settings);
