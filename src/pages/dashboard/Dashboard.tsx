@@ -18,6 +18,7 @@ const Dashboard = () => {
   const [alerts, setAlerts] = useState<any[]>([]);
   const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
   const [growthCount, setGrowthCount] = useState(0);
+  const [highlightAlert, setHighlightAlert] = useState<any>(null);
 
   useEffect(() => {
     let mounted = true;
