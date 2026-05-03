@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Droplets, FlaskConical, Thermometer, Eye, Activity, Fish, AlertCircle, Waves, TrendingUp, Siren, Lightbulb } from "lucide-react";
 import { toast } from "sonner";
-import { useRef } from "react";
+
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
 import { evaluatePond, deriveBehavior, getSettings, Settings, DEFAULT_SETTINGS } from "@/lib/pond";
 import { format } from "date-fns";
