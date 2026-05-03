@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { AppShell } from "@/components/AppShell";
 import { PageHeader, EmptyState } from "@/components/Common";
 import { supabase } from "@/integrations/supabase/client";
