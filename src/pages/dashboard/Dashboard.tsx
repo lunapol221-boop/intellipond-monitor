@@ -1,10 +1,12 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { AppShell } from "@/components/AppShell";
 import { PageHeader, EmptyState } from "@/components/Common";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Droplets, FlaskConical, Thermometer, Eye, Activity, Fish, AlertCircle, Waves, TrendingUp } from "lucide-react";
+import { Droplets, FlaskConical, Thermometer, Eye, Activity, Fish, AlertCircle, Waves, TrendingUp, Siren, Lightbulb } from "lucide-react";
+import { toast } from "sonner";
+
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
 import { evaluatePond, deriveBehavior, getSettings, Settings, DEFAULT_SETTINGS } from "@/lib/pond";
 import { format } from "date-fns";
@@ -16,6 +18,7 @@ const Dashboard = () => {
   const [alerts, setAlerts] = useState<any[]>([]);
   const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
   const [growthCount, setGrowthCount] = useState(0);
+  const [highlightAlert, setHighlightAlert] = useState<any>(null);
 
   useEffect(() => {
     let mounted = true;
@@ -38,8 +41,27 @@ const Dashboard = () => {
     };
     load();
     const ch = supabase.channel("dash").on("postgres_changes", { event: "*", schema: "public", table: "sensor_readings" }, load).subscribe();
-    return () => { mounted = false; supabase.removeChannel(ch); };
+    const alertCh = supabase
+      .channel("dash-alerts")
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "alerts" }, (payload) => {
+        const a: any = payload.new;
+        if (a.severity === "critical" || a.severity === "warning") {
+          setHighlightAlert(a);
+          toast[a.severity === "critical" ? "error" : "warning" as "error"](a.message, {
+            description: a.recommendation ?? undefined,
+          });
+        }
+        setAlerts((prev) => [a, ...prev].slice(0, 5));
+      })
+      .subscribe();
+    return () => { mounted = false; supabase.removeChannel(ch); supabase.removeChannel(alertCh); };
   }, []);
+
+  // Seed the highlight from the most recent unacknowledged critical/warning alert on load
+  useEffect(() => {
+    const top = alerts.find((a) => a.severity === "critical" || a.severity === "warning");
+    if (top && !highlightAlert) setHighlightAlert(top);
+  }, [alerts]);
 
   const evaluation = evaluatePond(latest, settings);
   const behavior = deriveBehavior(latest, settings);
@@ -58,6 +80,57 @@ const Dashboard = () => {
   return (
     <AppShell>
       <PageHeader title="Pond Overview" subtitle="Live snapshot of your aquaculture system." />
+
+      {highlightAlert && (
+        <Card
+          className={`mb-6 border-l-4 p-5 flex items-start gap-4 animate-in fade-in slide-in-from-top-2 ${
+            highlightAlert.severity === "critical"
+              ? "border-l-destructive bg-destructive/5"
+              : "border-l-warning bg-warning/5"
+          }`}
+        >
+          <div
+            className={`h-11 w-11 rounded-xl grid place-items-center shrink-0 ${
+              highlightAlert.severity === "critical"
+                ? "bg-destructive/15 text-destructive"
+                : "bg-warning/15 text-warning"
+            }`}
+          >
+            <Siren className="h-5 w-5" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-1">
+              <Badge
+                variant="outline"
+                className={`text-[10px] uppercase tracking-wider ${
+                  highlightAlert.severity === "critical"
+                    ? "border-destructive/40 text-destructive"
+                    : "border-warning/40 text-warning"
+                }`}
+              >
+                {highlightAlert.severity} · new recommendation
+              </Badge>
+              <span className="text-[10px] text-muted-foreground font-mono">
+                {format(new Date(highlightAlert.created_at), "MMM d · HH:mm")}
+              </span>
+            </div>
+            <div className="font-semibold text-base leading-snug">{highlightAlert.message}</div>
+            {highlightAlert.recommendation && (
+              <div className="mt-2 flex items-start gap-2 text-sm text-foreground/80 bg-background/60 rounded-lg p-3 border border-border/60">
+                <Lightbulb className="h-4 w-4 text-accent shrink-0 mt-0.5" />
+                <span>{highlightAlert.recommendation}</span>
+              </div>
+            )}
+          </div>
+          <button
+            onClick={() => setHighlightAlert(null)}
+            className="text-xs text-muted-foreground hover:text-foreground shrink-0"
+            aria-label="Dismiss"
+          >
+            Dismiss
+          </button>
+        </Card>
+      )}
 
       {/* Hero status */}
       <Card className="overflow-hidden border-border/60 mb-6">
