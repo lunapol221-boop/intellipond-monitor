@@ -81,6 +81,57 @@ const Dashboard = () => {
     <AppShell>
       <PageHeader title="Pond Overview" subtitle="Live snapshot of your aquaculture system." />
 
+      {highlightAlert && (
+        <Card
+          className={`mb-6 border-l-4 p-5 flex items-start gap-4 animate-in fade-in slide-in-from-top-2 ${
+            highlightAlert.severity === "critical"
+              ? "border-l-destructive bg-destructive/5"
+              : "border-l-warning bg-warning/5"
+          }`}
+        >
+          <div
+            className={`h-11 w-11 rounded-xl grid place-items-center shrink-0 ${
+              highlightAlert.severity === "critical"
+                ? "bg-destructive/15 text-destructive"
+                : "bg-warning/15 text-warning"
+            }`}
+          >
+            <Siren className="h-5 w-5" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-1">
+              <Badge
+                variant="outline"
+                className={`text-[10px] uppercase tracking-wider ${
+                  highlightAlert.severity === "critical"
+                    ? "border-destructive/40 text-destructive"
+                    : "border-warning/40 text-warning"
+                }`}
+              >
+                {highlightAlert.severity} · new recommendation
+              </Badge>
+              <span className="text-[10px] text-muted-foreground font-mono">
+                {format(new Date(highlightAlert.created_at), "MMM d · HH:mm")}
+              </span>
+            </div>
+            <div className="font-semibold text-base leading-snug">{highlightAlert.message}</div>
+            {highlightAlert.recommendation && (
+              <div className="mt-2 flex items-start gap-2 text-sm text-foreground/80 bg-background/60 rounded-lg p-3 border border-border/60">
+                <Lightbulb className="h-4 w-4 text-accent shrink-0 mt-0.5" />
+                <span>{highlightAlert.recommendation}</span>
+              </div>
+            )}
+          </div>
+          <button
+            onClick={() => setHighlightAlert(null)}
+            className="text-xs text-muted-foreground hover:text-foreground shrink-0"
+            aria-label="Dismiss"
+          >
+            Dismiss
+          </button>
+        </Card>
+      )}
+
       {/* Hero status */}
       <Card className="overflow-hidden border-border/60 mb-6">
         <div className="grid md:grid-cols-3 gap-0">
