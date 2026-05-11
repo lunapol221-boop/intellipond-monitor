@@ -20,7 +20,7 @@ const ForgotPassword = () => {
     const { error } = await supabase.functions.invoke("send-reset-password-email", {
       body: {
         email: email.trim(),
-        redirectTo: `${window.location.origin}/reset-password`,
+        redirectTo: "https://intellipond-monitor.vercel.app/reset-password",
       },
     });
     setLoading(false);
