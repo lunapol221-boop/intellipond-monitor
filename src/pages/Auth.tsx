@@ -77,7 +77,13 @@ const Auth = () => {
             <TabsContent value="signin">
               <form onSubmit={handleSignIn} className="space-y-4 mt-6">
                 <div><Label>Email</Label><Input type="email" required value={email} onChange={e => setEmail(e.target.value)} /></div>
-                <div><Label>Password</Label><Input type="password" required value={password} onChange={e => setPassword(e.target.value)} /></div>
+                <div>
+                  <div className="flex items-center justify-between">
+                    <Label>Password</Label>
+                    <Link to="/forgot-password" className="text-xs text-accent hover:underline">Forgot password?</Link>
+                  </div>
+                  <Input type="password" required value={password} onChange={e => setPassword(e.target.value)} />
+                </div>
                 <Button type="submit" className="w-full gradient-aqua text-white border-0 hover:opacity-90" disabled={loading}>{loading ? "Signing in…" : "Sign in"}</Button>
               </form>
             </TabsContent>

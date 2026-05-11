@@ -7,6 +7,8 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import PendingApproval from "./pages/PendingApproval";
 import NotFound from "./pages/NotFound";
 import Dashboard from "./pages/dashboard/Dashboard";
@@ -34,6 +36,8 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/pending-approval" element={<PendingApproval />} />
 
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
