@@ -30,17 +30,19 @@ const Growth = () => {
           </div>
           <Card className="p-6">
             <h3 className="font-semibold mb-4">Growth Trend</h3>
-            <div className="h-80">
-              <ResponsiveContainer>
-                <LineChart data={records.map(r => ({ ...r, t: format(new Date(r.recorded_at), "MMM d") }))}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                  <XAxis dataKey="t" stroke="hsl(var(--muted-foreground))" fontSize={11} />
-                  <YAxis stroke="hsl(var(--muted-foreground))" fontSize={11} />
-                  <Tooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8 }} />
-                  <Line type="monotone" dataKey="avg_weight_g" stroke="hsl(var(--accent))" strokeWidth={2} name="Weight (g)" />
-                  <Line type="monotone" dataKey="avg_length_cm" stroke="hsl(var(--success))" strokeWidth={2} name="Length (cm)" />
-                </LineChart>
-              </ResponsiveContainer>
+            <div className="h-80 min-h-[20rem]">
+              <div key={records[records.length - 1]?.id ?? records.length} className="h-full w-full animate-fade-in">
+                <ResponsiveContainer>
+                  <LineChart data={records.map(r => ({ ...r, t: format(new Date(r.recorded_at), "MMM d") }))}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                    <XAxis dataKey="t" stroke="hsl(var(--muted-foreground))" fontSize={11} />
+                    <YAxis stroke="hsl(var(--muted-foreground))" fontSize={11} />
+                    <Tooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8 }} />
+                    <Line type="monotone" dataKey="avg_weight_g" stroke="hsl(var(--accent))" strokeWidth={2} name="Weight (g)" isAnimationActive animationDuration={600} animationEasing="ease-out" />
+                    <Line type="monotone" dataKey="avg_length_cm" stroke="hsl(var(--success))" strokeWidth={2} name="Length (cm)" isAnimationActive animationDuration={600} animationEasing="ease-out" />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
             </div>
           </Card>
         </>
