@@ -1,7 +1,9 @@
 import { Link } from "react-router-dom";
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Waves, Activity, Fish, Bell, ShieldCheck, ArrowRight } from "lucide-react";
+import { Slider } from "@/components/ui/slider";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Waves, Activity, Fish, Bell, ShieldCheck, ArrowRight, Settings2 } from "lucide-react";
 import heroImg from "@/assets/hero-water.jpg";
 import { useAuth } from "@/contexts/AuthContext";
 const PondScene = lazy(() => import("@/components/PondScene"));
