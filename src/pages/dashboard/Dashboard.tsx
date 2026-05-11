@@ -193,18 +193,20 @@ const Dashboard = () => {
           {history.length === 0 ? (
             <EmptyState icon={Activity} title="No sensor readings available yet." description="Charts will populate as data flows in." />
           ) : (
-            <div className="h-72">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={history.map(h => ({ ...h, t: format(new Date(h.recorded_at), "HH:mm") }))}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                  <XAxis dataKey="t" stroke="hsl(var(--muted-foreground))" fontSize={11} />
-                  <YAxis stroke="hsl(var(--muted-foreground))" fontSize={11} />
-                  <Tooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8 }} />
-                  <Line type="monotone" dataKey="do_mg_l" stroke="hsl(var(--accent))" strokeWidth={2} dot={false} name="DO" />
-                  <Line type="monotone" dataKey="ph" stroke="hsl(var(--success))" strokeWidth={2} dot={false} name="pH" />
-                  <Line type="monotone" dataKey="temperature_c" stroke="hsl(var(--warning))" strokeWidth={2} dot={false} name="Temp" />
-                </LineChart>
-              </ResponsiveContainer>
+            <div className="h-72 min-h-[18rem]">
+              <div key={history[history.length - 1]?.id ?? history.length} className="h-full w-full animate-fade-in">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={history.map(h => ({ ...h, t: format(new Date(h.recorded_at), "HH:mm") }))}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                    <XAxis dataKey="t" stroke="hsl(var(--muted-foreground))" fontSize={11} />
+                    <YAxis stroke="hsl(var(--muted-foreground))" fontSize={11} />
+                    <Tooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8 }} />
+                    <Line type="monotone" dataKey="do_mg_l" stroke="hsl(var(--accent))" strokeWidth={2} dot={false} name="DO" isAnimationActive animationDuration={500} animationEasing="ease-out" />
+                    <Line type="monotone" dataKey="ph" stroke="hsl(var(--success))" strokeWidth={2} dot={false} name="pH" isAnimationActive animationDuration={500} animationEasing="ease-out" />
+                    <Line type="monotone" dataKey="temperature_c" stroke="hsl(var(--warning))" strokeWidth={2} dot={false} name="Temp" isAnimationActive animationDuration={500} animationEasing="ease-out" />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
             </div>
           )}
         </Card>
