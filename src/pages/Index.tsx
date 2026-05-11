@@ -5,6 +5,7 @@ import { Waves, Activity, Fish, Bell, ShieldCheck, ArrowRight } from "lucide-rea
 import heroImg from "@/assets/hero-water.jpg";
 import { useAuth } from "@/contexts/AuthContext";
 const PondScene = lazy(() => import("@/components/PondScene"));
+const AquariumScene = lazy(() => import("@/components/AquariumScene"));
 
 const Index = () => {
   const { user } = useAuth();
@@ -117,13 +118,24 @@ const Index = () => {
               ))}
             </div>
           </div>
-          <div className="relative aspect-square rounded-3xl overflow-hidden gradient-deep p-10 text-white shadow-elevated">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_70%,hsl(188_85%_55%/0.4),transparent_60%)]" />
-            <div className="relative h-full flex flex-col justify-between">
-              <Waves className="h-8 w-8" />
+          <div className="relative aspect-square rounded-3xl overflow-hidden gradient-deep text-white shadow-elevated">
+            <div className="absolute inset-0">
+              <Suspense fallback={<div className="h-full w-full" />}>
+                <AquariumScene />
+              </Suspense>
+            </div>
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-primary/70 pointer-events-none" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,hsl(188_85%_55%/0.25),transparent_60%)] pointer-events-none" />
+            <div className="relative h-full flex flex-col justify-between p-10 pointer-events-none">
+              <div className="flex items-center justify-between">
+                <Waves className="h-8 w-8 drop-shadow" />
+                <span className="text-[10px] uppercase tracking-widest text-white/70 font-mono flex items-center gap-2">
+                  <span className="ripple-dot bg-accent" /> Bangus aquarium
+                </span>
+              </div>
               <div>
-                <div className="text-5xl font-semibold tracking-tight">Calm.<br />Clear.<br />Continuous.</div>
-                <div className="mt-6 text-white/60 text-sm">An academic-grade platform designed for real fishpond operations.</div>
+                <div className="text-5xl font-semibold tracking-tight drop-shadow-lg">Calm.<br />Clear.<br />Continuous.</div>
+                <div className="mt-6 text-white/80 text-sm max-w-xs">An academic-grade platform designed for real fishpond operations.</div>
               </div>
             </div>
           </div>
