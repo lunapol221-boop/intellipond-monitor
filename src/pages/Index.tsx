@@ -5,6 +5,7 @@ import { Waves, Activity, Fish, Bell, ShieldCheck, ArrowRight } from "lucide-rea
 import heroImg from "@/assets/hero-water.jpg";
 import { useAuth } from "@/contexts/AuthContext";
 const PondScene = lazy(() => import("@/components/PondScene"));
+const AquariumScene = lazy(() => import("@/components/AquariumScene"));
 
 const Index = () => {
   const { user } = useAuth();
