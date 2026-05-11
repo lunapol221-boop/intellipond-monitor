@@ -164,7 +164,11 @@ const Dashboard = () => {
       {/* Sensors */}
       <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         {sensors.map((s, i) => (
-          <div key={i} className="stat-tile">
+          <div
+            key={i}
+            className="stat-tile animate-fade-in hover-scale"
+            style={{ animationDelay: `${i * 80}ms`, animationFillMode: "both" }}
+          >
             <div className="flex items-center justify-between mb-3">
               <s.icon className="h-5 w-5 text-accent" />
               {latest && <span className={`ripple-dot ${s.ok ? "bg-success" : "bg-destructive"}`} />}

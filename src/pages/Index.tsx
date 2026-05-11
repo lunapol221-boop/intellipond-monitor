@@ -33,35 +33,35 @@ const Index = () => {
         <img src={heroImg} alt="" className="absolute inset-0 h-full w-full object-cover" />
         <div className="absolute inset-0 gradient-deep opacity-85" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_30%,hsl(188_85%_55%/0.4),transparent_60%)]" />
-        <div className="relative max-w-7xl mx-auto px-6 py-32 grid lg:grid-cols-12 gap-10 items-center w-full">
-          <div className="lg:col-span-7 text-white">
+        <div className="relative max-w-7xl mx-auto px-6 py-24 md:py-32 grid lg:grid-cols-12 gap-10 items-center w-full">
+          <div className="lg:col-span-7 text-white animate-fade-in">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur border border-white/20 text-xs uppercase tracking-widest text-white/80 mb-6">
               <span className="ripple-dot bg-accent" /> Live aquaculture intelligence
             </div>
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-semibold leading-[1.05] tracking-tight">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold leading-[1.05] tracking-tight">
               Bangus monitoring,<br />
               <span className="text-gradient">re-engineered.</span>
             </h1>
-            <p className="mt-6 text-lg text-white/75 max-w-xl">
+            <p className="mt-6 text-base sm:text-lg text-white/75 max-w-xl">
               IntelliPond fuses IoT sensor streams with machine learning to give fishpond operators a calm, clear view of water quality, behavior and growth — in real time.
             </p>
             <div className="mt-10 flex flex-wrap gap-3">
               <Link to={user ? "/dashboard" : "/auth"}>
-                <Button size="lg" className="bg-white text-primary hover:bg-white/90 h-12 px-6">
+                <Button size="lg" className="bg-white text-primary hover:bg-white/90 h-12 px-6 hover-scale">
                   {user ? "Go to dashboard" : "Get started"} <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </Link>
               <a href="#features"><Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10 hover:text-white h-12 px-6 bg-transparent">Explore the platform</Button></a>
             </div>
           </div>
-          <div className="lg:col-span-5 hidden lg:block">
-            <div className="relative h-[500px]">
-              <div className="absolute -inset-4 gradient-aqua opacity-30 blur-3xl rounded-full" />
+          <div className="lg:col-span-5 w-full">
+            <div className="relative w-full mx-auto max-w-[520px] aspect-square sm:aspect-[4/3] lg:aspect-square h-[280px] sm:h-[360px] md:h-[420px] lg:h-[480px]">
+              <div className="absolute -inset-4 gradient-aqua opacity-30 blur-3xl rounded-full pointer-events-none" />
               <div className="relative h-full w-full rounded-3xl overflow-hidden border border-white/15 bg-white/5 backdrop-blur-sm">
                 <Suspense fallback={<div className="h-full w-full grid place-items-center text-white/40 text-xs">Loading scene…</div>}>
                   <PondScene />
                 </Suspense>
-                <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between text-white/70 text-xs font-mono">
+                <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-white/70 text-[10px] sm:text-xs font-mono pointer-events-none">
                   <span className="flex items-center gap-2"><span className="ripple-dot bg-accent" /> Live simulation</span>
                   <span>IntelliPond · 3D</span>
                 </div>

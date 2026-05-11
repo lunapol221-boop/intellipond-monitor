@@ -26,9 +26,13 @@ const AdminOverview = () => {
     <AppShell admin>
       <PageHeader title="Admin Console" subtitle="System-wide visibility for IntelliPond." />
       <div className="grid md:grid-cols-3 gap-4">
-        {tiles.map(t => (
-          <Card key={t.label} className="p-6">
-            <t.icon className="h-5 w-5 text-accent mb-3" />
+        {tiles.map((t, i) => (
+          <Card
+            key={t.label}
+            className="p-6 animate-fade-in hover-scale transition-shadow hover:shadow-[var(--shadow-elevated)]"
+            style={{ animationDelay: `${i * 70}ms`, animationFillMode: "both" }}
+          >
+            <t.icon className="h-5 w-5 text-accent mb-3 transition-transform group-hover:scale-110" />
             <div className="text-xs uppercase tracking-wider text-muted-foreground">{t.label}</div>
             <div className="font-mono text-3xl mt-1">{t.val}</div>
           </Card>

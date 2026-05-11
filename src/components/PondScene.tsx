@@ -83,7 +83,13 @@ function WaterBlob() {
 
 export const PondScene = () => {
   return (
-    <Canvas camera={{ position: [0, 0, 6], fov: 45 }} dpr={[1, 1.5]} className="!touch-none">
+    <Canvas
+      camera={{ position: [0, 0, 6], fov: 45 }}
+      dpr={[1, 1.5]}
+      resize={{ scroll: false }}
+      style={{ width: "100%", height: "100%", display: "block" }}
+      className="!touch-none"
+    >
       <Suspense fallback={null}>
         <ambientLight intensity={0.4} />
         <directionalLight position={[5, 5, 5]} intensity={1.2} color="#9be8ff" />
