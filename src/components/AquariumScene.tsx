@@ -216,7 +216,12 @@ function Bubbles({ count = 24 }: { count?: number }) {
 }
 
 
-export const AquariumScene = () => {
+type AquariumSceneProps = {
+  rippleIntensity?: number;
+  causticsBrightness?: number;
+};
+
+export const AquariumScene = ({ rippleIntensity = 1, causticsBrightness = 0.7 }: AquariumSceneProps) => {
   const fish = useMemo(
     () => [
       { depth: 0.2, color: "#cdd9df", speed: 0.7, scale: 1.1, yBase: 0.4 },
@@ -250,7 +255,7 @@ export const AquariumScene = () => {
         <directionalLight position={[2, 4, 3]} intensity={1.1} color="#aee6ff" />
         <pointLight position={[-3, 2, 2]} intensity={0.8} color="#3ec6e0" />
         <pointLight position={[3, -1, 1]} intensity={0.5} color="#9be8ff" />
-        <SandFloor />
+        <SandFloor brightness={causticsBrightness} />
         {weeds.map((w, i) => (
           <Seaweed key={i} x={w.x} z={w.z} height={w.h} hue={w.hue} />
         ))}
@@ -258,7 +263,7 @@ export const AquariumScene = () => {
           <Bangus key={i} {...f} />
         ))}
         <Bubbles />
-        <WaterSurface />
+        <WaterSurface intensity={rippleIntensity} />
         <fog attach="fog" args={["#0a4a6e", 5, 12]} />
       </Suspense>
     </Canvas>
