@@ -1,8 +1,10 @@
 import { Link } from "react-router-dom";
+import { lazy, Suspense } from "react";
 import { Button } from "@/components/ui/button";
-import { Waves, Activity, Fish, Bell, ShieldCheck, ArrowRight, Droplets, Thermometer, FlaskConical, Eye } from "lucide-react";
+import { Waves, Activity, Fish, Bell, ShieldCheck, ArrowRight } from "lucide-react";
 import heroImg from "@/assets/hero-water.jpg";
 import { useAuth } from "@/contexts/AuthContext";
+const PondScene = lazy(() => import("@/components/PondScene"));
 
 const Index = () => {
   const { user } = useAuth();
@@ -53,23 +55,17 @@ const Index = () => {
             </div>
           </div>
           <div className="lg:col-span-5 hidden lg:block">
-            <div className="relative">
+            <div className="relative h-[500px]">
               <div className="absolute -inset-4 gradient-aqua opacity-30 blur-3xl rounded-full" />
-              <div className="relative grid grid-cols-2 gap-4">
-                {[
-                  { icon: Droplets, label: "Dissolved O₂", val: "—", unit: "mg/L" },
-                  { icon: FlaskConical, label: "pH", val: "—", unit: "" },
-                  { icon: Thermometer, label: "Temperature", val: "—", unit: "°C" },
-                  { icon: Eye, label: "Turbidity", val: "—", unit: "NTU" },
-                ].map((s, i) => (
-                  <div key={i} className="rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 p-5 text-white">
-                    <s.icon className="h-5 w-5 text-accent mb-3" />
-                    <div className="text-xs uppercase tracking-wider text-white/60">{s.label}</div>
-                    <div className="font-mono text-2xl mt-1">{s.val}<span className="text-sm text-white/60 ml-1">{s.unit}</span></div>
-                  </div>
-                ))}
+              <div className="relative h-full w-full rounded-3xl overflow-hidden border border-white/15 bg-white/5 backdrop-blur-sm">
+                <Suspense fallback={<div className="h-full w-full grid place-items-center text-white/40 text-xs">Loading scene…</div>}>
+                  <PondScene />
+                </Suspense>
+                <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between text-white/70 text-xs font-mono">
+                  <span className="flex items-center gap-2"><span className="ripple-dot bg-accent" /> Live simulation</span>
+                  <span>IntelliPond · 3D</span>
+                </div>
               </div>
-              <p className="text-center text-xs text-white/50 mt-4">Awaiting first sensor sync</p>
             </div>
           </div>
         </div>
