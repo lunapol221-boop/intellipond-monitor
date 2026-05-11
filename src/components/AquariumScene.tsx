@@ -76,10 +76,100 @@ function Seaweed({ x, z, height, hue }: { x: number; z: number; height: number; 
 }
 
 function SandFloor() {
+  const ref = useRef<THREE.ShaderMaterial>(null!);
+  useFrame((state) => {
+    if (ref.current) ref.current.uniforms.uTime.value = state.clock.elapsedTime;
+  });
   return (
     <mesh position={[0, -1.7, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-      <planeGeometry args={[10, 6]} />
-      <meshStandardMaterial color="#cbb486" roughness={1} />
+      <planeGeometry args={[12, 8, 1, 1]} />
+      <shaderMaterial
+        ref={ref}
+        uniforms={{
+          uTime: { value: 0 },
+          uSand: { value: new THREE.Color("#cbb486") },
+          uCaustic: { value: new THREE.Color("#dff6ff") },
+        }}
+        vertexShader={`
+          varying vec2 vUv;
+          void main() {
+            vUv = uv;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+          }
+        `}
+        fragmentShader={`
+          varying vec2 vUv;
+          uniform float uTime;
+          uniform vec3 uSand;
+          uniform vec3 uCaustic;
+
+          // Smooth pseudo-caustics from layered sin waves
+          float caustic(vec2 uv, float t) {
+            vec2 p = uv * 6.0;
+            float a = sin(p.x * 1.3 + t * 0.9) + sin(p.y * 1.7 - t * 1.1);
+            float b = sin((p.x + p.y) * 1.1 + t * 0.7) + sin((p.x - p.y) * 1.4 - t * 0.8);
+            float c = sin(length(p - vec2(sin(t*0.5), cos(t*0.4))) * 2.0 - t * 1.2);
+            float v = (a + b + c) / 6.0 + 0.5;
+            v = pow(clamp(v, 0.0, 1.0), 3.0);
+            return v;
+          }
+
+          void main() {
+            float c = caustic(vUv, uTime);
+            vec3 col = mix(uSand, uCaustic, c * 0.7);
+            gl_FragColor = vec4(col, 1.0);
+          }
+        `}
+      />
+    </mesh>
+  );
+}
+
+function WaterSurface() {
+  const ref = useRef<THREE.ShaderMaterial>(null!);
+  useFrame((state) => {
+    if (ref.current) ref.current.uniforms.uTime.value = state.clock.elapsedTime;
+  });
+  return (
+    <mesh position={[0, 1.65, 0]} rotation={[Math.PI / 2, 0, 0]}>
+      <planeGeometry args={[12, 8, 64, 48]} />
+      <shaderMaterial
+        ref={ref}
+        transparent
+        side={THREE.DoubleSide}
+        uniforms={{
+          uTime: { value: 0 },
+          uColor: { value: new THREE.Color("#9be8ff") },
+          uDeep: { value: new THREE.Color("#0a4a6e") },
+        }}
+        vertexShader={`
+          varying vec2 vUv;
+          varying float vWave;
+          uniform float uTime;
+          void main() {
+            vUv = uv;
+            vec3 p = position;
+            float w = sin(p.x * 1.8 + uTime * 1.2) * 0.06
+                    + sin(p.y * 2.4 - uTime * 0.9) * 0.05
+                    + sin((p.x + p.y) * 1.5 + uTime * 0.6) * 0.04;
+            p.z += w;
+            vWave = w;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(p, 1.0);
+          }
+        `}
+        fragmentShader={`
+          varying vec2 vUv;
+          varying float vWave;
+          uniform vec3 uColor;
+          uniform vec3 uDeep;
+          void main() {
+            float shimmer = smoothstep(-0.05, 0.08, vWave);
+            vec3 col = mix(uDeep, uColor, shimmer);
+            float alpha = 0.25 + shimmer * 0.35;
+            gl_FragColor = vec4(col, alpha);
+          }
+        `}
+      />
     </mesh>
   );
 }
@@ -118,21 +208,6 @@ function Bubbles({ count = 24 }: { count?: number }) {
   );
 }
 
-function Caustics() {
-  const ref = useRef<THREE.Mesh>(null!);
-  useFrame((state) => {
-    if (ref.current) {
-      const m = ref.current.material as THREE.MeshBasicMaterial;
-      m.opacity = 0.08 + Math.sin(state.clock.elapsedTime * 0.8) * 0.05;
-    }
-  });
-  return (
-    <mesh ref={ref} position={[0, 1.6, 0]} rotation={[Math.PI / 2, 0, 0]}>
-      <planeGeometry args={[10, 6]} />
-      <meshBasicMaterial color="#9be8ff" transparent opacity={0.1} />
-    </mesh>
-  );
-}
 
 export const AquariumScene = () => {
   const fish = useMemo(
@@ -176,7 +251,7 @@ export const AquariumScene = () => {
           <Bangus key={i} {...f} />
         ))}
         <Bubbles />
-        <Caustics />
+        <WaterSurface />
         <fog attach="fog" args={["#0a4a6e", 5, 12]} />
       </Suspense>
     </Canvas>
