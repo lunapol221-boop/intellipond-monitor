@@ -11,6 +11,8 @@ const AquariumScene = lazy(() => import("@/components/AquariumScene"));
 
 const Index = () => {
   const { user } = useAuth();
+  const [ripple, setRipple] = useState(1);
+  const [caustics, setCaustics] = useState(0.7);
   return (
     <div className="min-h-screen bg-background">
       {/* Nav */}
