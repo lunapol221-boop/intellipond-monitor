@@ -1,8 +1,10 @@
 import { Link } from "react-router-dom";
+import { lazy, Suspense } from "react";
 import { Button } from "@/components/ui/button";
-import { Waves, Activity, Fish, Bell, ShieldCheck, ArrowRight, Droplets, Thermometer, FlaskConical, Eye } from "lucide-react";
+import { Waves, Activity, Fish, Bell, ShieldCheck, ArrowRight } from "lucide-react";
 import heroImg from "@/assets/hero-water.jpg";
 import { useAuth } from "@/contexts/AuthContext";
+const PondScene = lazy(() => import("@/components/PondScene"));
 
 const Index = () => {
   const { user } = useAuth();
