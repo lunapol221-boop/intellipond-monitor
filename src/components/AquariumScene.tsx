@@ -266,7 +266,7 @@ export const AquariumScene = () => {
           <Bangus key={i} {...f} />
         ))}
         <Bubbles />
-        <Caustics />
+        <WaterSurface />
         <fog attach="fog" args={["#0a4a6e", 5, 12]} />
       </Suspense>
     </Canvas>
