@@ -208,21 +208,6 @@ function Bubbles({ count = 24 }: { count?: number }) {
   );
 }
 
-function Caustics() {
-  const ref = useRef<THREE.Mesh>(null!);
-  useFrame((state) => {
-    if (ref.current) {
-      const m = ref.current.material as THREE.MeshBasicMaterial;
-      m.opacity = 0.08 + Math.sin(state.clock.elapsedTime * 0.8) * 0.05;
-    }
-  });
-  return (
-    <mesh ref={ref} position={[0, 1.6, 0]} rotation={[Math.PI / 2, 0, 0]}>
-      <planeGeometry args={[10, 6]} />
-      <meshBasicMaterial color="#9be8ff" transparent opacity={0.1} />
-    </mesh>
-  );
-}
 
 export const AquariumScene = () => {
   const fish = useMemo(
