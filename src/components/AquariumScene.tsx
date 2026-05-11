@@ -75,10 +75,13 @@ function Seaweed({ x, z, height, hue }: { x: number; z: number; height: number; 
   );
 }
 
-function SandFloor() {
+function SandFloor({ brightness }: { brightness: number }) {
   const ref = useRef<THREE.ShaderMaterial>(null!);
   useFrame((state) => {
-    if (ref.current) ref.current.uniforms.uTime.value = state.clock.elapsedTime;
+    if (ref.current) {
+      ref.current.uniforms.uTime.value = state.clock.elapsedTime;
+      ref.current.uniforms.uBrightness.value = brightness;
+    }
   });
   return (
     <mesh position={[0, -1.7, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
@@ -87,6 +90,7 @@ function SandFloor() {
         ref={ref}
         uniforms={{
           uTime: { value: 0 },
+          uBrightness: { value: brightness },
           uSand: { value: new THREE.Color("#cbb486") },
           uCaustic: { value: new THREE.Color("#dff6ff") },
         }}
@@ -100,10 +104,10 @@ function SandFloor() {
         fragmentShader={`
           varying vec2 vUv;
           uniform float uTime;
+          uniform float uBrightness;
           uniform vec3 uSand;
           uniform vec3 uCaustic;
 
-          // Smooth pseudo-caustics from layered sin waves
           float caustic(vec2 uv, float t) {
             vec2 p = uv * 6.0;
             float a = sin(p.x * 1.3 + t * 0.9) + sin(p.y * 1.7 - t * 1.1);
@@ -116,7 +120,7 @@ function SandFloor() {
 
           void main() {
             float c = caustic(vUv, uTime);
-            vec3 col = mix(uSand, uCaustic, c * 0.7);
+            vec3 col = mix(uSand, uCaustic, clamp(c * uBrightness, 0.0, 1.0));
             gl_FragColor = vec4(col, 1.0);
           }
         `}
@@ -125,10 +129,13 @@ function SandFloor() {
   );
 }
 
-function WaterSurface() {
+function WaterSurface({ intensity }: { intensity: number }) {
   const ref = useRef<THREE.ShaderMaterial>(null!);
   useFrame((state) => {
-    if (ref.current) ref.current.uniforms.uTime.value = state.clock.elapsedTime;
+    if (ref.current) {
+      ref.current.uniforms.uTime.value = state.clock.elapsedTime;
+      ref.current.uniforms.uIntensity.value = intensity;
+    }
   });
   return (
     <mesh position={[0, 1.65, 0]} rotation={[Math.PI / 2, 0, 0]}>
@@ -139,26 +146,26 @@ function WaterSurface() {
         side={THREE.DoubleSide}
         uniforms={{
           uTime: { value: 0 },
+          uIntensity: { value: intensity },
           uColor: { value: new THREE.Color("#9be8ff") },
           uDeep: { value: new THREE.Color("#0a4a6e") },
         }}
         vertexShader={`
-          varying vec2 vUv;
           varying float vWave;
           uniform float uTime;
+          uniform float uIntensity;
           void main() {
-            vUv = uv;
             vec3 p = position;
             float w = sin(p.x * 1.8 + uTime * 1.2) * 0.06
                     + sin(p.y * 2.4 - uTime * 0.9) * 0.05
                     + sin((p.x + p.y) * 1.5 + uTime * 0.6) * 0.04;
+            w *= uIntensity;
             p.z += w;
             vWave = w;
             gl_Position = projectionMatrix * modelViewMatrix * vec4(p, 1.0);
           }
         `}
         fragmentShader={`
-          varying vec2 vUv;
           varying float vWave;
           uniform vec3 uColor;
           uniform vec3 uDeep;
@@ -209,7 +216,12 @@ function Bubbles({ count = 24 }: { count?: number }) {
 }
 
 
-export const AquariumScene = () => {
+type AquariumSceneProps = {
+  rippleIntensity?: number;
+  causticsBrightness?: number;
+};
+
+export const AquariumScene = ({ rippleIntensity = 1, causticsBrightness = 0.7 }: AquariumSceneProps) => {
   const fish = useMemo(
     () => [
       { depth: 0.2, color: "#cdd9df", speed: 0.7, scale: 1.1, yBase: 0.4 },
@@ -243,7 +255,7 @@ export const AquariumScene = () => {
         <directionalLight position={[2, 4, 3]} intensity={1.1} color="#aee6ff" />
         <pointLight position={[-3, 2, 2]} intensity={0.8} color="#3ec6e0" />
         <pointLight position={[3, -1, 1]} intensity={0.5} color="#9be8ff" />
-        <SandFloor />
+        <SandFloor brightness={causticsBrightness} />
         {weeds.map((w, i) => (
           <Seaweed key={i} x={w.x} z={w.z} height={w.h} hue={w.hue} />
         ))}
@@ -251,7 +263,7 @@ export const AquariumScene = () => {
           <Bangus key={i} {...f} />
         ))}
         <Bubbles />
-        <WaterSurface />
+        <WaterSurface intensity={rippleIntensity} />
         <fog attach="fog" args={["#0a4a6e", 5, 12]} />
       </Suspense>
     </Canvas>

@@ -1,7 +1,9 @@
 import { Link } from "react-router-dom";
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Waves, Activity, Fish, Bell, ShieldCheck, ArrowRight } from "lucide-react";
+import { Slider } from "@/components/ui/slider";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Waves, Activity, Fish, Bell, ShieldCheck, ArrowRight, Settings2 } from "lucide-react";
 import heroImg from "@/assets/hero-water.jpg";
 import { useAuth } from "@/contexts/AuthContext";
 const PondScene = lazy(() => import("@/components/PondScene"));
@@ -9,6 +11,8 @@ const AquariumScene = lazy(() => import("@/components/AquariumScene"));
 
 const Index = () => {
   const { user } = useAuth();
+  const [ripple, setRipple] = useState(1);
+  const [caustics, setCaustics] = useState(0.7);
   return (
     <div className="min-h-screen bg-background">
       {/* Nav */}
@@ -121,19 +125,49 @@ const Index = () => {
           <div className="relative aspect-square rounded-3xl overflow-hidden gradient-deep text-white shadow-elevated">
             <div className="absolute inset-0">
               <Suspense fallback={<div className="h-full w-full" />}>
-                <AquariumScene />
+                <AquariumScene rippleIntensity={ripple} causticsBrightness={caustics} />
               </Suspense>
             </div>
             <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-primary/70 pointer-events-none" />
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,hsl(188_85%_55%/0.25),transparent_60%)] pointer-events-none" />
-            <div className="relative h-full flex flex-col justify-between p-10 pointer-events-none">
+            <div className="relative h-full flex flex-col justify-between p-10">
               <div className="flex items-center justify-between">
                 <Waves className="h-8 w-8 drop-shadow" />
-                <span className="text-[10px] uppercase tracking-widest text-white/70 font-mono flex items-center gap-2">
-                  <span className="ripple-dot bg-accent" /> Bangus aquarium
-                </span>
+                <div className="flex items-center gap-3">
+                  <span className="text-[10px] uppercase tracking-widest text-white/70 font-mono flex items-center gap-2 pointer-events-none">
+                    <span className="ripple-dot bg-accent" /> Bangus aquarium
+                  </span>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <button
+                        aria-label="Aquarium controls"
+                        className="h-8 w-8 grid place-items-center rounded-full bg-white/10 hover:bg-white/20 backdrop-blur border border-white/20 transition"
+                      >
+                        <Settings2 className="h-4 w-4" />
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent align="end" className="w-64 bg-card/95 backdrop-blur">
+                      <div className="space-y-4">
+                        <div>
+                          <div className="flex items-center justify-between mb-2">
+                            <label className="text-xs font-medium">Ripple intensity</label>
+                            <span className="text-[10px] font-mono text-muted-foreground">{ripple.toFixed(2)}</span>
+                          </div>
+                          <Slider value={[ripple]} onValueChange={(v) => setRipple(v[0])} min={0} max={2} step={0.05} />
+                        </div>
+                        <div>
+                          <div className="flex items-center justify-between mb-2">
+                            <label className="text-xs font-medium">Caustics brightness</label>
+                            <span className="text-[10px] font-mono text-muted-foreground">{caustics.toFixed(2)}</span>
+                          </div>
+                          <Slider value={[caustics]} onValueChange={(v) => setCaustics(v[0])} min={0} max={1.5} step={0.05} />
+                        </div>
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                </div>
               </div>
-              <div>
+              <div className="pointer-events-none">
                 <div className="text-5xl font-semibold tracking-tight drop-shadow-lg">Calm.<br />Clear.<br />Continuous.</div>
                 <div className="mt-6 text-white/80 text-sm max-w-xs">An academic-grade platform designed for real fishpond operations.</div>
               </div>
