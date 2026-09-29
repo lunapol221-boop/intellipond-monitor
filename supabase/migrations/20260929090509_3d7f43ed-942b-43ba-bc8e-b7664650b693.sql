@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX IF NOT EXISTS sensor_status_pond_type_unique ON public.sensor_status (pond_id, sensor_type);
