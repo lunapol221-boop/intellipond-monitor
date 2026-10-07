@@ -33,18 +33,6 @@ const Behavior = () => {
   return (
     <AppShell>
       <PageHeader title="Bangus Behavior" subtitle="Behavior insights derived from live pond conditions." />
-      <Card className="p-8 mb-6 gradient-deep text-white">
-        <div className="text-xs uppercase tracking-widest text-white/60">Current Behavior Status</div>
-        <div className="text-5xl font-semibold mt-2">{current}</div>
-        <p className="text-white/70 mt-3 max-w-xl text-sm">
-          {current === "Normal" && "Fish are exhibiting healthy, normal activity based on recent water conditions."}
-          {current === "Stressed" && "Conditions suggest the fish may be experiencing stress. Investigate water quality."}
-          {current === "Low Activity" && "Slight deviations detected. Monitor closely."}
-          {current === "Possible Risk" && "Multiple parameters out of range — immediate attention recommended."}
-          {current === "Unknown" && "Awaiting sensor data to evaluate behavior."}
-        </p>
-      </Card>
-
       <Card className="p-6">
         <h3 className="font-semibold mb-4">Recent Behavior Timeline</h3>
         {readings.length === 0 ? (
