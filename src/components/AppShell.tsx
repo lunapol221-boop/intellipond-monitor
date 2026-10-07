@@ -3,12 +3,11 @@ import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { LayoutDashboard, Activity, Fish, Bell, Settings, Database, Users, FileText, LogOut, Waves, Sliders, Menu } from "lucide-react";
+import { LayoutDashboard, Fish, Bell, Settings, Database, Users, FileText, LogOut, Waves, Sliders, Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const userNav = [
   { to: "/dashboard", label: "Overview", icon: LayoutDashboard },
-  { to: "/dashboard/behavior", label: "Behavior", icon: Activity },
   { to: "/dashboard/growth", label: "Growth", icon: Fish },
   { to: "/dashboard/alerts", label: "Alerts", icon: Bell },
 ];

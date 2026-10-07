@@ -12,7 +12,6 @@ import ResetPassword from "./pages/ResetPassword";
 import PendingApproval from "./pages/PendingApproval";
 import NotFound from "./pages/NotFound";
 import Dashboard from "./pages/dashboard/Dashboard";
-import Behavior from "./pages/dashboard/Behavior";
 import Growth from "./pages/dashboard/Growth";
 import Alerts from "./pages/dashboard/Alerts";
 import AdminOverview from "./pages/admin/AdminOverview";
@@ -41,7 +40,6 @@ const App = () => (
             <Route path="/pending-approval" element={<PendingApproval />} />
 
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-            <Route path="/dashboard/behavior" element={<ProtectedRoute><Behavior /></ProtectedRoute>} />
             <Route path="/dashboard/growth" element={<ProtectedRoute><Growth /></ProtectedRoute>} />
             <Route path="/dashboard/alerts" element={<ProtectedRoute><Alerts /></ProtectedRoute>} />
 
