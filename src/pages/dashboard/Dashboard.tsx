@@ -8,7 +8,7 @@ import { Droplets, FlaskConical, Thermometer, Eye, Activity, Fish, AlertCircle, 
 import { toast } from "sonner";
 
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
-import { evaluatePond, deriveBehavior, getSettings, Settings, DEFAULT_SETTINGS } from "@/lib/pond";
+import { evaluatePond, getSettings, Settings, DEFAULT_SETTINGS } from "@/lib/pond";
 import { format } from "date-fns";
 
 const Dashboard = () => {
@@ -64,7 +64,6 @@ const Dashboard = () => {
   }, [alerts]);
 
   const evaluation = evaluatePond(latest, settings);
-  const behavior = deriveBehavior(latest, settings);
 
   const sensors = [
     { icon: Droplets, label: "Dissolved O₂", val: latest?.do_mg_l, unit: "mg/L", ok: latest && latest.do_mg_l >= settings.do_min && latest.do_mg_l <= settings.do_max },
@@ -153,7 +152,6 @@ const Dashboard = () => {
             </div>
           </div>
           <div className="p-6 grid grid-cols-2 gap-3 bg-card">
-            <MiniStat icon={Activity} label="Behavior" value={behavior} accent={behavior === "Normal"} />
             <MiniStat icon={Fish} label="Growth records" value={growthCount.toString()} />
             <MiniStat icon={AlertCircle} label="Open alerts" value={alerts.length.toString()} accent={alerts.length === 0} />
             <MiniStat icon={TrendingUp} label="Ponds" value={pondCount.toString()} />
