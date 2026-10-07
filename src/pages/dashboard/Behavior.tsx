@@ -28,8 +28,6 @@ const Behavior = () => {
     })();
   }, []);
 
-  const current = readings[0] ? deriveBehavior(readings[0], settings) : "Unknown";
-
   return (
     <AppShell>
       <PageHeader title="Bangus Behavior" subtitle="Behavior insights derived from live pond conditions." />
